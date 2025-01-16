@@ -1,0 +1,57 @@
+name: 'Docker Test'
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/docker-test.yml
+      - Dockerfile
+      - scripts/**
+      - tests/**
+
+jobs:
+  test:
+    name: Docker Test
+
+    runs-on: ubuntu-latest
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          # network=host driver-opt needed to push to local registry
+          # https://docs.docker.com/build/ci/github-actions/named-contexts/#using-with-a-container-builder
+          driver-opts: network=host
+      -
+        name: Build base image
+        uses: docker/bake-action@v5
+        with:
+          files: ./docker-bake.hcl
+          targets: image-test-base
+          push: true
+      -
+        name: Build test image
+        uses: docker/bake-action@v5
+        with:
+          files: ./docker-bake.hcl
+          targets: image-test
+          load: true
+      -
+        name: Test
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
+          bash tests/test.sh

@@ -21,44 +21,50 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Prepare
-        run: echo "TAG=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       -
         name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Login to ghcr.io
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Build and push
-        uses: docker/build-push-action@v4
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          context: '.'
-          file: './Dockerfile'
-          platforms: 'linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7'
+          labels: |
+            org.opencontainers.image.title=vaultwarden-backup
+            org.opencontainers.image.description=Backup vaultwarden SQLite3/PostgreSQL/MySQL/MariaDB database by rclone
+            org.opencontainers.image.authors=ttionya
+            org.opencontainers.image.version=${{ env.VERSION }}
+      -
+        name: Build and push
+        uses: docker/bake-action@v5
+        env:
+          VERSION: ${{ env.VERSION }}
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file-labels }}
+          targets: image-stable
           push: true
-          tags: |
-            ttionya/vaultwarden-backup:latest
-            ttionya/vaultwarden-backup:${{ env.TAG }}
-            ttionya/bitwardenrs-backup:latest
-            ttionya/bitwardenrs-backup:${{ env.TAG }}
-            ghcr.io/ttionya/vaultwarden-backup:latest
-            ghcr.io/ttionya/vaultwarden-backup:${{ env.TAG }}
 
   publish-beta:
     name: Docker Publish Beta
@@ -70,32 +76,43 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Prepare
-        run: echo "TAG=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       -
         name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
-        uses: docker/build-push-action@v4
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          context: '.'
-          file: './Dockerfile'
-          platforms: 'linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7'
+          labels: |
+            org.opencontainers.image.title=vaultwarden-backup
+            org.opencontainers.image.description=Backup vaultwarden SQLite3/PostgreSQL/MySQL/MariaDB database by rclone
+            org.opencontainers.image.authors=ttionya
+            org.opencontainers.image.version=${{ env.VERSION }}
+      -
+        name: Build and push
+        uses: docker/bake-action@v5
+        env:
+          VERSION: ${{ env.VERSION }}
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file-labels }}
+          targets: image-beta
           push: true
-          tags: |
-            ttionya/vaultwarden-backup:${{ env.TAG }}
 
   publish-schedule:
     name: Docker Publish Schedule
@@ -108,51 +125,57 @@ jobs:
       -
         name: Get Tag
         id: tag
-        uses: pozetroninc/github-action-get-latest-release@v0.7.0
+        uses: pozetroninc/github-action-get-latest-release@v0.8.0
         with:
           repository: ${{ github.repository }}
           excludes: prerelease, draft
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: refs/tags/${{ steps.tag.outputs.release }}
       -
         name: Prepare
         run: |
           TAG=${{ steps.tag.outputs.release }}
-          echo "TAG=${TAG#v}" >> $GITHUB_ENV
+          echo "VERSION=${TAG#v}" >> $GITHUB_ENV
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       -
         name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Login to ghcr.io
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Build and push
-        uses: docker/build-push-action@v4
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          context: '.'
-          file: './Dockerfile'
-          platforms: 'linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7'
+          labels: |
+            org.opencontainers.image.title=vaultwarden-backup
+            org.opencontainers.image.description=Backup vaultwarden SQLite3/PostgreSQL/MySQL/MariaDB database by rclone
+            org.opencontainers.image.authors=ttionya
+            org.opencontainers.image.version=${{ env.VERSION }}
+      -
+        name: Build and push
+        uses: docker/bake-action@v5
+        env:
+          VERSION: ${{ env.VERSION }}
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file-labels }}
+          targets: image-schedule
           push: true
-          tags: |
-            ttionya/vaultwarden-backup:latest
-            ttionya/vaultwarden-backup:${{ env.TAG }}
-            ttionya/bitwardenrs-backup:latest
-            ttionya/bitwardenrs-backup:${{ env.TAG }}
-            ghcr.io/ttionya/vaultwarden-backup:latest
-            ghcr.io/ttionya/vaultwarden-backup:${{ env.TAG }}

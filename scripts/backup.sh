@@ -43,7 +43,7 @@ function backup_db_postgresql() {
     if [[ $? != 0 ]]; then
         color red "backup vaultwarden postgresql database failed"
 
-        send_mail_content "FALSE" "Backup failed at $(date +"%Y-%m-%d %H:%M:%S %Z"). Reason: Backup postgresql database failed."
+        send_notification "failure" "Backup failed at $(date +"%Y-%m-%d %H:%M:%S %Z"). Reason: Backup postgresql database failed."
 
         exit 1
     fi
@@ -56,7 +56,7 @@ function backup_db_mysql() {
     if [[ $? != 0 ]]; then
         color red "backup vaultwarden mysql database failed"
 
-        send_mail_content "FALSE" "Backup failed at $(date +"%Y-%m-%d %H:%M:%S %Z"). Reason: Backup mysql database failed."
+        send_notification "failure" "Backup failed at $(date +"%Y-%m-%d %H:%M:%S %Z"). Reason: Backup mysql database failed."
 
         exit 1
     fi
@@ -163,7 +163,7 @@ function upload() {
     if [[ ! -e "${UPLOAD_FILE}" ]]; then
         color red "upload file not found"
 
-        send_mail_content "FALSE" "File upload failed at $(date +"%Y-%m-%d %H:%M:%S %Z"). Reason: Upload file not found."
+        send_notification "failure" "File upload failed at $(date +"%Y-%m-%d %H:%M:%S %Z"). Reason: Upload file not found."
 
         exit 1
     fi
@@ -184,7 +184,7 @@ function upload() {
     done
 
     if [[ "${HAS_ERROR}" == "TRUE" ]]; then
-        send_mail_content "FALSE" "File upload failed at $(date +"%Y-%m-%d %H:%M:%S %Z")."
+        send_notification "failure" "File upload failed at $(date +"%Y-%m-%d %H:%M:%S %Z")."
 
         exit 1
     fi
@@ -214,7 +214,10 @@ function clear_history() {
 color blue "running the backup program at $(date +"%Y-%m-%d %H:%M:%S %Z")"
 
 init_env
-check_rclone_connection
+
+send_notification "start" "Start backup at $(date +"%Y-%m-%d %H:%M:%S %Z")"
+
+check_rclone_connection any
 
 clear_dir
 backup_init
@@ -224,7 +227,6 @@ upload
 clear_dir
 clear_history
 
-send_mail_content "TRUE" "The file was successfully uploaded at $(date +"%Y-%m-%d %H:%M:%S %Z")."
-send_ping
+send_notification "success" "The file was successfully uploaded at $(date +"%Y-%m-%d %H:%M:%S %Z")."
 
 color none ""

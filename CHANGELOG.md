@@ -1,5 +1,140 @@
 # Changelog
 
+## v1.22.0 (20250116)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.69.0`
+- Support PostgreSQL 17 (close [#178](https://github.com/ttionya/vaultwarden-backup/issues/178))
+- Allow partial storage system connection failures during backup verification (close [#175](https://github.com/ttionya/vaultwarden-backup/issues/175))
+
+<br>
+
+
+
+## v1.21.3 (20241117)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.68.2`
+- Use standardized docker labels
+
+<br>
+
+
+
+## v1.21.2 (20240925)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.68.1`
+
+<br>
+
+
+
+## v1.21.1 (20240914)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.68.0`
+
+<br>
+
+
+
+## v1.21.0 (20240907)
+
+### Feature
+
+- Enhance ping functionality to support customizable curl options. (close [#164](https://github.com/ttionya/vaultwarden-backup/issues/164))
+
+<br>
+
+
+
+## v1.20.0 (20240721)
+
+### Feature
+
+- Add support for fine-grained ping messages
+- Update Dockerfile base image to `rclone/rclone:1.67.0`
+- Support testing
+
+<br>
+
+
+
+## v1.19.10 (20240313)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.66.0`
+
+<br>
+
+
+
+## v1.19.9 (20240223)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.65.2`
+
+<br>
+
+
+
+## v1.19.8 (20240112)
+
+### Fixed
+
+- Fix `restore` command parameter parsing error (fixed [#141](https://github.com/ttionya/vaultwarden-backup/issues/141))
+
+<br>
+
+
+
+## v1.19.7 (20240111)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.65.1`
+
+<br>
+
+
+
+## v1.19.6 (20231214)
+
+### Feature
+
+- Support PostgreSQL 16 (close [#137](https://github.com/ttionya/vaultwarden-backup/issues/137))
+
+<br>
+
+
+
+## v1.19.4 (20231128)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.65.0`
+
+<br>
+
+
+
+## v1.19.3 (20231021)
+
+### Feature
+
+- Update Dockerfile base image to `rclone/rclone:1.64.2`
+
+<br>
+
+
+
 ## v1.19.2 (20230912)
 
 ### Feature
